@@ -12,7 +12,7 @@ class Button
 {
 private:
     const uint8_t pin;
-    uint8_t timeDebounce = 50;
+    const uint8_t timeDebounce = 50;
     uint32_t lastDebounceTime = 0;
 
     ButtonState currentState = ButtonState::Released;
@@ -26,6 +26,7 @@ private:
     ButtonState readState();
     
     bool pressedEvent = false;
+    bool releasedEvent = false;
 
 public:
     Button(uint8_t pin);
@@ -34,5 +35,6 @@ public:
     void update();
     bool isPressed();
     bool wasPressed();
+    bool wasReleased();
 
 };
