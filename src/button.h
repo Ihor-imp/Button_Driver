@@ -1,6 +1,12 @@
 #pragma once
 #include<Arduino.h>
 
+enum class ButtonState
+{
+    Released,
+    Pressed
+};
+
 class Button
 
 {
@@ -9,13 +15,17 @@ private:
     uint8_t timeDebounce = 50;
     uint32_t lastDebounceTime = 0;
 
-    bool currentState = false;
-    bool lastState = false;
+    ButtonState currentState = ButtonState::Released;
+    ButtonState lastState = ButtonState::Released;
 
-    bool reading = false;
-    bool lastReading = false;
+    ButtonState reading = ButtonState::Released;
+    ButtonState lastReading = ButtonState::Released;
 
     void debounce();
+    void detectEvents();
+    ButtonState readState();
+    
+    bool pressedEvent = false;
 
 public:
     Button(uint8_t pin);
@@ -23,5 +33,6 @@ public:
     void begin();
     void update();
     bool isPressed();
+    bool wasPressed();
 
 };

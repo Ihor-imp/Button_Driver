@@ -8,7 +8,7 @@ Button::Button(uint8_t pin)
 void Button::begin()
 {
    pinMode(pin, INPUT_PULLUP);
-   lastReading = digitalRead(pin);
+   lastReading = readState();
    currentState = lastReading;
    lastState = currentState;
 }
@@ -16,7 +16,7 @@ void Button::begin()
 
 void Button::debounce()
 {
-    reading = digitalRead(pin);
+    reading = readState();
     if (reading != lastReading)
     {
         lastDebounceTime = millis();
@@ -24,18 +24,47 @@ void Button::debounce()
     }
     if ((millis() - lastDebounceTime >= timeDebounce) && currentState != lastReading)
     {
-        lastState = currentState;
         currentState = lastReading;
     }
+    
+}
+ButtonState Button::readState()
+{
+    if (digitalRead(pin) == LOW)
+    {
+        return ButtonState::Pressed;
+    }
+
+    return ButtonState::Released;        
+}
+
+void Button::detectEvents()
+{
+    if (currentState == ButtonState::Pressed && lastState == ButtonState::Released)
+    {
+        pressedEvent = true;
+    }
+    lastState = currentState;
     
 }
 
 void Button::update()
 {    
     debounce();
+    detectEvents();
 }
 
 bool Button::isPressed()
 {
-    return currentState == LOW;
+    return currentState == ButtonState::Pressed;
+}
+bool Button::wasPressed()
+{
+    if (pressedEvent == true)
+    {
+        pressedEvent = false;
+        return true;
+    }
+    return false;
+    
 }
