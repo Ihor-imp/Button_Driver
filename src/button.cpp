@@ -4,7 +4,9 @@ Button::Button(uint8_t pin)
     : pin(pin)
 {
 }
-
+/**
+ * Initializes button GPIO.
+ */
 void Button::begin()
 {
     pinMode(pin, INPUT_PULLUP);
@@ -13,6 +15,9 @@ void Button::begin()
     lastState = currentState;
 }
 
+/**
+ * Time to determine the button state.
+ */
 void Button::debounce()
 {
     reading = readState();
@@ -26,6 +31,10 @@ void Button::debounce()
         currentState = lastReading;
     }
 }
+
+/**
+ * Read button state.
+ */
 ButtonState Button::readState()
 {
     if (digitalRead(pin) == LOW)
@@ -36,6 +45,9 @@ ButtonState Button::readState()
     return ButtonState::Released;
 }
 
+/**
+ * Detected button events.
+ */
 void Button::detectEvents()
 {
     if (currentState == ButtonState::Pressed && lastState == ButtonState::Released)
@@ -50,17 +62,26 @@ void Button::detectEvents()
     lastState = currentState;
 }
 
+/**
+ * Updates button state  and events.
+ */
 void Button::update()
 {
     debounce();
     detectEvents();
 }
 
+/**
+ * Returns current button state.
+ */
 bool Button::isPressed()
 {
     return currentState == ButtonState::Pressed;
 }
 
+/**
+ * Returns true once when button is pressed.
+ */
 bool Button::wasPressed()
 {
     if (pressedEvent == true)
@@ -71,6 +92,9 @@ bool Button::wasPressed()
     return false;
 }
 
+/**
+ * Returns true once when button is released.
+ */
 bool Button::wasReleased()
 {
     if (releasedEvent == true)
