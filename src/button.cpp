@@ -53,12 +53,23 @@ void Button::detectEvents()
     if (currentState == ButtonState::Pressed && lastState == ButtonState::Released)
     {
         pressedEvent = true;
+        pressStartTime = millis();
+        longPressHandled = false;
     }
 
     if (lastState == ButtonState::Pressed && currentState == ButtonState::Released)
     {
         releasedEvent = true;
+        longPressHandled = false;
+        longPressedEvent = false;
     }
+
+    if (currentState == ButtonState::Pressed && !longPressHandled && millis() - pressStartTime >= longPressTime)
+    {
+        longPressedEvent = true;
+        longPressHandled = true;
+    }
+
     lastState = currentState;
 }
 
@@ -100,6 +111,19 @@ bool Button::wasReleased()
     if (releasedEvent == true)
     {
         releasedEvent = false;
+        return true;
+    }
+    return false;
+}
+
+/**
+ *  Returns true once when button pressed is long.
+ */
+bool Button::wasLongPressed()
+{
+    if (longPressedEvent == true)
+    {
+        longPressedEvent = false;
         return true;
     }
     return false;
