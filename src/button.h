@@ -1,5 +1,5 @@
 #pragma once
-#include<Arduino.h>
+#include <Arduino.h>
 
 enum class ButtonState
 {
@@ -14,9 +14,10 @@ private:
     const uint8_t pin;
     const uint32_t timeDebounce = 50;
     const uint32_t longPressTime = 3000;
+    const uint32_t timeForDouble = 500;
     uint32_t lastDebounceTime = 0;
     uint32_t pressStartTime = 0;
-
+    uint32_t firstClick = 0;
 
     ButtonState currentState = ButtonState::Released;
     ButtonState lastState = ButtonState::Released;
@@ -29,10 +30,12 @@ private:
     ButtonState readState();
 
     bool longPressHandled = false;
-    
+
     bool pressedEvent = false;
     bool releasedEvent = false;
     bool longPressedEvent = false;
+    bool doubleClickEvent = false;
+    bool waitSecondClick = false;
 
 public:
     Button(uint8_t pin);
@@ -43,5 +46,5 @@ public:
     bool wasPressed();
     bool wasReleased();
     bool wasLongPressed();
-
+    bool wasDoubleClicked();
 };

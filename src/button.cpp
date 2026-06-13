@@ -63,21 +63,32 @@ void Button::detectEvents()
         longPressHandled = false;
         longPressedEvent = false;
 
-        firstClick = millis();
-        doubleClickHandled = false;
+        if (!waitSecondClick)
+        {
+            firstClick = millis();
+            waitSecondClick = true;
+        }
+        else
+        {
+            if (millis() - firstClick <= timeForDouble)
+            {
+                doubleClickEvent = true;
+            }
+            waitSecondClick = false;
+        }
     }
+
+    if (waitSecondClick && millis() - firstClick > timeForDouble)
+    {
+        waitSecondClick = false;
+    }
+    
 
     if (currentState == ButtonState::Pressed && !longPressHandled && millis() - pressStartTime >= longPressTime)
     {
         longPressedEvent = true;
         longPressHandled = true;
     }
-
-    if (lastState == ButtonState::Pressed && currentState == ButtonState::Released && !doubleClickHandled && millis() - firstClick <= timeForDouble)
-    {
-            doubleClickEvent = true;
-    }
-    
 
     lastState = currentState;
 }
@@ -133,6 +144,19 @@ bool Button::wasLongPressed()
     if (longPressedEvent == true)
     {
         longPressedEvent = false;
+        return true;
+    }
+    return false;
+}
+
+/**
+ *  Return true once when a double click is detected.
+ */
+bool Button::wasDoubleClicked()
+{
+    if (doubleClickEvent == true)
+    {
+        doubleClickEvent = false;
         return true;
     }
     return false;
