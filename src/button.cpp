@@ -46,9 +46,9 @@ ButtonState Button::readState()
 }
 
 /**
- * Detected button events.
+ * Detects a button press event.
  */
-void Button::detectEvents()
+void Button::detectPressedEvent()
 {
     if (currentState == ButtonState::Pressed && lastState == ButtonState::Released)
     {
@@ -56,40 +56,78 @@ void Button::detectEvents()
         pressStartTime = millis();
         longPressHandled = false;
     }
+}
 
-    if (lastState == ButtonState::Pressed && currentState == ButtonState::Released)
-    {
-        releasedEvent = true;
-        longPressHandled = false;
-        longPressedEvent = false;
+/**
+ * Detects when the button is released.
+ */
+void Button::detectReleasedEvent()
+{
+    releasedEvent = true;
+    longPressHandled = false;
+    longPressedEvent = false;
+}
 
-        if (!waitSecondClick)
-        {
-            firstClick = millis();
-            waitSecondClick = true;
-        }
-        else
-        {
-            if (millis() - firstClick <= timeForDouble)
-            {
-                doubleClickEvent = true;
-            }
-            waitSecondClick = false;
-        }
-    }
-
-    if (waitSecondClick && millis() - firstClick > timeForDouble)
-    {
-        waitSecondClick = false;
-    }
-    
-
+/**
+ * Detects a long button press event.
+ */
+void Button::detectLongEvent()
+{
     if (currentState == ButtonState::Pressed && !longPressHandled && millis() - pressStartTime >= longPressTime)
     {
         longPressedEvent = true;
         longPressHandled = true;
     }
+}
 
+/**
+ * Detects a double button press event.
+ */
+void Button::detectDoubleEvent()
+{
+    if (!waitSecondClick)
+    {
+        firstClick = millis();
+        waitSecondClick = true;
+    }
+    else
+    {
+        if (millis() - firstClick <= timeForDouble)
+        {
+            doubleClickEvent = true;
+        }
+        waitSecondClick = false;
+    }
+}
+
+/**
+ * Cancels waiting for second click after timeout.
+ */
+void Button::handleDoubleClickTimeout()
+{
+    if (waitSecondClick && millis() - firstClick > timeForDouble)
+    {
+        waitSecondClick = false;
+    }
+}
+
+/**
+ * Detected button events.
+ */
+void Button::detectEvents()
+{
+    detectPressedEvent();
+
+    if (lastState == ButtonState::Pressed && currentState == ButtonState::Released)
+    {
+        detectReleasedEvent();
+        detectDoubleEvent();
+    }
+
+    detectLongEvent();
+
+    handleDoubleClickTimeout();
+    
     lastState = currentState;
 }
 

@@ -37,6 +37,12 @@ private:
     bool doubleClickEvent = false;
     bool waitSecondClick = false;
 
+    void detectPressedEvent();
+    void detectReleasedEvent();
+    void detectDoubleEvent();
+    void detectLongEvent();
+    void handleDoubleClickTimeout();
+
 public:
     Button(uint8_t pin);
 
