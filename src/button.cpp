@@ -62,6 +62,9 @@ void Button::detectEvents()
         releasedEvent = true;
         longPressHandled = false;
         longPressedEvent = false;
+
+        firstClick = millis();
+        doubleClickHandled = false;
     }
 
     if (currentState == ButtonState::Pressed && !longPressHandled && millis() - pressStartTime >= longPressTime)
@@ -69,6 +72,12 @@ void Button::detectEvents()
         longPressedEvent = true;
         longPressHandled = true;
     }
+
+    if (lastState == ButtonState::Pressed && currentState == ButtonState::Released && !doubleClickHandled && millis() - firstClick <= timeForDouble)
+    {
+            doubleClickEvent = true;
+    }
+    
 
     lastState = currentState;
 }
